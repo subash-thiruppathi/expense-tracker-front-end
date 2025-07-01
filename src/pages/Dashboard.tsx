@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { use, useEffect, useRef, useState } from 'react';
 import { Row, Col, Card, Statistic, Typography, Space } from 'antd';
 import { 
   DollarOutlined, 
@@ -7,19 +7,27 @@ import {
   ClockCircleOutlined 
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { useAppSelector } from '../store/hooks';
-import { selectUser, selectHasRole, selectHasAnyRole } from '../store/slices/authSlice';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { selectUser, selectHasRole, selectHasAnyRole,getNotifications } from '../store/slices/authSlice';
 import expenseService from '../services/expense.service';
 import { QUERY_KEYS } from '../utils/constants';
 import { IExpenseStatus } from '../enum';
+// import useNotifications from '../hooks/useNotifications';
+
 
 const { Title } = Typography;
 
 const Dashboard: React.FC = () => {
   const user = useAppSelector(selectUser);
+  const dispatch = useAppDispatch();
   const hasEmployeeRole = useAppSelector(selectHasRole('EMPLOYEE'));
   const hasManagerRole = useAppSelector(selectHasAnyRole(['MANAGER', 'ACCOUNTANT', 'ADMIN']));
   const hasAdminRole = useAppSelector(selectHasRole('ADMIN'));
+  // const { requestNotificationPermission } = useNotifications();
+  const hasFetchedNotifications = useRef(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
+
+
 
   // Fetch dashboard data based on user role
   const { data: myExpenses } = useQuery({
@@ -40,6 +48,9 @@ const Dashboard: React.FC = () => {
     enabled: hasAdminRole,
   });
 
+
+  const [notificationsStatus, setNotificationsStatus] = useState('idle'); // 'idle', 'loading', 'loaded', 'error'
+
   // Calculate statistics
   const getMyExpenseStats = () => {
     if (!myExpenses?.data) return { total: 0, pending: 0, approved: 0, totalAmount: 0 };
@@ -52,6 +63,19 @@ const Dashboard: React.FC = () => {
       totalAmount: expenses.reduce((sum, e) => sum + e.amount, 0),
     };
   };
+
+  const getNoticications = () => {
+    if (!user) return [];
+    const notifications = [];
+    dispatch(getNotifications()).unwrap()
+      .then(data => {
+        console.log('Notifications:', data);
+        // notifications.push();
+      })
+      .catch(error => {
+        console.error('Failed to fetch notifications:', error);
+      });
+  }
 
   const getPendingApprovalStats = () => {
     if (!pendingApprovals?.data) return { count: 0, totalAmount: 0 };

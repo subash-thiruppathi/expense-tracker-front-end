@@ -2,12 +2,14 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { User, LoginCredentials, RegisterData } from '../../types';
 import authService from '../../services/auth.service';
 import { showToast } from './uiSlice';
+import apiService from '../../services/api';
 
 interface AuthState {
   user: User | null;
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
+  notifications: any[]; // Adjust type as needed
 }
 
 const initialState: AuthState = {
@@ -15,6 +17,7 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   isAuthenticated: false,
+  notifications: [],
 };
 
 // Async thunks
@@ -39,6 +42,21 @@ export const registerUser = createAsyncThunk(
     try {
       const response = await authService.register(userData);
       dispatch(showToast({ message: 'Registration successful!', type: 'success' }));
+      return response;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Registration failed';
+      dispatch(showToast({ message: errorMessage, type: 'error' }));
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const getNotifications = createAsyncThunk(
+  'auth/getNotifications',
+  async (_arg,{ dispatch, rejectWithValue }) => {
+    try {
+      const response = await apiService.get('notifications');
+      console.log('Notifications:', response);
       return response;
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Registration failed';
@@ -119,13 +137,30 @@ const authSlice = createSlice({
       })
       .addCase(initializeAuth.fulfilled, (state, action) => {
         state.loading = false;
-        if (action.payload) {
+        if (action.payload && (!state.user || state.user.id !== action.payload.user.id)) {
           state.user = action.payload.user;
           state.isAuthenticated = true;
         }
       })
       .addCase(initializeAuth.rejected, (state) => {
         state.loading = false;
+      });
+      // Get notifications cases
+      builder
+      .addCase(getNotifications.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getNotifications.fulfilled, (state, action) => {   
+        state.loading = false;
+        // Assuming action.payload contains the notifications
+        console.log('Notifications fetched:', action.payload);
+        state.error = null;
+      })
+      .addCase(getNotifications.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        console.error('Failed to fetch notifications:', state.error);
       });
   },
 });

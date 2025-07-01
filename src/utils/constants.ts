@@ -50,7 +50,8 @@ export const QUERY_KEYS = {
   MY_EXPENSES: 'myExpenses',
   PENDING_APPROVALS: 'pendingApprovals',
   ALL_EXPENSES: 'allExpenses',
-  EXPENSE_DETAILS: 'expenseDetails'
+  EXPENSE_DETAILS: 'expenseDetails',
+  NOTIFICATIONS: 'notifications'
 };
 
 export const APPROVAL_LEVELS: Record<UserRole, number> = {

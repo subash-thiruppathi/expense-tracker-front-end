@@ -14,12 +14,17 @@ import { STORAGE_KEYS } from '../utils/constants';
 import apiService from './api';
 
 class AuthService {
+  private _currentUser: User | null = null;
+  private _currentUserString: string | null = null;
+
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const response = await apiService.post<AuthResponse>('/auth/login', credentials);
     
     // Store token and user data
     localStorage.setItem(STORAGE_KEYS.TOKEN, response.token);
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.user));
+    this._currentUser = response.user;
+    this._currentUserString = JSON.stringify(response.user);
     
     return response;
   }
@@ -30,6 +35,8 @@ class AuthService {
     // Store token and user data
     localStorage.setItem(STORAGE_KEYS.TOKEN, response.token);
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.user));
+    this._currentUser = response.user;
+    this._currentUserString = JSON.stringify(response.user);
     
     return response;
   }
@@ -37,19 +44,30 @@ class AuthService {
   logout(): void {
     localStorage.removeItem(STORAGE_KEYS.TOKEN);
     localStorage.removeItem(STORAGE_KEYS.USER);
+    this._currentUser = null;
+    this._currentUserString = null;
   }
 
   getCurrentUser(): User | null {
     const userStr = localStorage.getItem(STORAGE_KEYS.USER);
+
     if (userStr) {
+      if (userStr === this._currentUserString && this._currentUser) {
+        return this._currentUser; // Return memoized object if string hasn't changed
+      }
       try {
-        return JSON.parse(userStr);
+        const parsedUser = JSON.parse(userStr);
+        this._currentUser = parsedUser;
+        this._currentUserString = userStr;
+        return parsedUser;
       } catch (error) {
         console.error('Error parsing user data:', error);
         this.logout();
         return null;
       }
     }
+    this._currentUser = null;
+    this._currentUserString = null;
     return null;
   }
 
@@ -97,6 +115,11 @@ class AuthService {
   // Change password (authenticated users)
   async changePassword(data: ChangePasswordData): Promise<{ message: string }> {
     return apiService.post<{ message: string }>('/auth/change-password', data);
+  }
+
+  // Register notification token (for push notifications)
+  async registerNotificationToken(data: any): Promise<{ message: string }> {
+    return apiService.post<{ message: string }>('notifications/device-token', data);
   }
 }
 

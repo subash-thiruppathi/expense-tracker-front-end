@@ -46,9 +46,6 @@ const UserOnboardingForm: React.FC<UserOnboardingFormProps> = ({ onSuccess, onCa
       setOnboardedUser(response.user);
       setCredentialsModalVisible(true);
       form.resetFields();
-      
-      // Don't call onSuccess immediately to prevent page reload
-      // The modal will handle the success state
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Failed to onboard user';
       message.error(errorMessage);

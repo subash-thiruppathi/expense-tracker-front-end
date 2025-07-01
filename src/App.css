@@ -221,3 +221,18 @@
     border: 1px solid #d9d9d9;
   }
 }
+.notification-icon{
+  height: max-content;
+  position: relative;
+}
+.notification-icon::after{
+  content: ".";
+  color: red;
+  font-size: 60px;
+  border-radius: 50%;
+  position: absolute;
+  /* bottom: 0; */
+  top: -24px;
+  right: -1px;
+  z-index: 1;
+}

@@ -1,10 +1,13 @@
 import React from 'react';
 import { Layout, Avatar, Dropdown, Space, Typography, Button } from 'antd';
-import { UserOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons';
+import { UserOutlined, LogoutOutlined, SettingOutlined, NotificationOutlined, NotificationTwoTone, MailTwoTone } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { selectUser, logout } from '../../store/slices/authSlice';
-import { USER_ROLES } from '../../utils/constants';
+import { QUERY_KEYS, USER_ROLES } from '../../utils/constants';
+import { useQuery } from '@tanstack/react-query';
+import expenseService from '../../services/expense.service';
+import { console } from 'inspector';
 
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
@@ -17,6 +20,14 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
   const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
+
+  // const { data: notifications } = useQuery({
+  //   queryKey: [QUERY_KEYS.NOTIFICATIONS],
+  //   queryFn: () => expenseService.getAllExpenses(1, 100),
+  //   // enabled: hasAdminRole,
+  // });
+
+  // console.log('Notifications:', notifications);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -84,7 +95,15 @@ const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
             style={{ backgroundColor: '#1890ff', cursor: 'pointer' }}
             icon={<UserOutlined />}
           />
+        {/* <div style={{ cursor: 'pointer', color: '#1890ff' ,marginRight:'10px'}}>
+          <NotificationTwoTone />
+          </div> */}
         </Dropdown>
+        <div className='notification-icon' >
+          <Avatar
+            style={{ backgroundColor: '#fff', cursor: 'pointer' ,fontSize:'22px'}}
+            icon={<MailTwoTone />}></Avatar>
+        </div>
       </Space>
     </AntHeader>
   );
