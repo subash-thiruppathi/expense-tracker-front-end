@@ -9,7 +9,8 @@ import {
   UnorderedListOutlined,
   UserOutlined,
   LockOutlined,
-  UsergroupAddOutlined
+  UsergroupAddOutlined,
+  BarChartOutlined
 } from '@ant-design/icons';
 import { useAppSelector } from '../../store/hooks';
 import { selectHasRole, selectHasAnyRole } from '../../store/slices/authSlice';
@@ -62,6 +63,12 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       key: '/user-management',
       icon: <UsergroupAddOutlined />,
       label: 'User Management',
+      show: hasAdminRole,
+    },
+    {
+      key: '/admin/analytics',
+      icon: <BarChartOutlined />,
+      label: 'Analytics Dashboard',
       show: hasAdminRole,
     },
     {

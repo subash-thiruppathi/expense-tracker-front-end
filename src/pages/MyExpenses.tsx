@@ -31,6 +31,17 @@ const MyExpenses: React.FC = () => {
     navigate(`/expense/${expenseId}`);
   };
 
+  const REVERSE_STATUS_MAP = {
+    PENDING: 1,
+    MANAGER_APPROVED: 2,
+    ACCOUNTANT_APPROVED: 3,
+    FULLY_APPROVED: 4,
+    REJECTED: 5
+  };
+
+  type StatusKey = keyof typeof REVERSE_STATUS_MAP;
+
+
   const columns: ColumnsType<Expense> = [
     {
       title: 'Title',
@@ -60,23 +71,44 @@ const MyExpenses: React.FC = () => {
       dataIndex: 'status_id',
       key: 'status_id',
       render: (status_id: number) => {
-        const statusMap: Record<number, keyof typeof EXPENSE_STATUSES> = {
+        const statusMap: Record<number, StatusKey> = {
           1: 'PENDING',
-          2: 'MANAGER_APPROVED', 
+          2: 'MANAGER_APPROVED',
           3: 'ACCOUNTANT_APPROVED',
           4: 'FULLY_APPROVED',
-          5: 'REJECTED'
+          5: 'REJECTED',
         };
         const statusKey = statusMap[status_id];
-        const statusConfig = statusKey ? EXPENSE_STATUSES[statusKey] : null;
+        const statusConfig = EXPENSE_STATUSES[statusKey];
         return (
           <Tag color={statusConfig?.color || 'default'}>
             {statusConfig?.label || `Status ${status_id}`}
           </Tag>
         );
       },
-      filteredValue: statusFilter ? [statusFilter] : null,
-      onFilter: (value, record) => record.status_id.toString() === value,
+      filteredValue: statusFilter
+      ? [
+          (() => {
+            const key = statusFilter as StatusKey;
+            const id = REVERSE_STATUS_MAP[key];
+            const resolvedId = Number(id); // <-- force number
+            console.log('🔍 Filtered value resolved:', {
+              statusFilter,
+              resolvedId,
+              type: typeof resolvedId,
+            });
+            return resolvedId;
+          })(),
+        ]
+      : null,
+      onFilter: (value, record) => {
+        console.log('🔎 Filtering record:', {
+          filterValue: value,
+          recordStatusId: record.status_id,
+          match: record.status_id === value,
+        });
+        return record.status_id === Number(value);
+      },
     },
     {
       title: 'Submitted',

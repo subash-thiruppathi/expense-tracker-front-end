@@ -17,6 +17,7 @@ import ForgotPassword from '../pages/ForgotPassword';
 import ResetPassword from '../pages/ResetPassword';
 import ChangePassword from '../pages/ChangePassword';
 import UserManagement from '../pages/UserManagement';
+import AnalyticsDashboardPage from '../pages/admin/AnalyticsDashboardPage';
 import { ROUTES } from '../utils/constants';
 import useNotifications from '../hooks/useNotifications';
 
@@ -156,6 +157,18 @@ const AppRoutes: React.FC = () => {
             <ProtectedRoute requiredRoles={['ADMIN']}>
               <Layout>
                 <UserManagement />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Analytics dashboard route (Admin only) */}
+        <Route
+          path="/admin/analytics"
+          element={
+            <ProtectedRoute requiredRoles={['ADMIN']}>
+              <Layout>
+                <AnalyticsDashboardPage />
               </Layout>
             </ProtectedRoute>
           }

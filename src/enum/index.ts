@@ -4,4 +4,6 @@ export enum IExpenseStatus {
     ACCOUNTANT_APPROVED = 3,
     FULLY_APPROVED = 4,
     REJECTED = 5,
-  }
+}
+
+  

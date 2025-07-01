@@ -40,13 +40,8 @@ const AllExpenses: React.FC = () => {
   const columns: ColumnsType<Expense> = [
     {
       title: 'Employee',
-      dataIndex: 'employee_name',
-      key: 'employee_name',
-      filteredValue: searchText ? [searchText] : null,
-      onFilter: (value, record) =>
-        record.requester.name.toLowerCase().includes((value as string).toLowerCase()) ||
-        record.title.toLowerCase().includes((value as string).toLowerCase()) ||
-        record.description.toLowerCase().includes((value as string).toLowerCase()),
+      dataIndex: 'requester',
+      render: (_, record) => record.requester?.name ?? '-',
     },
     {
       title: 'Title',
