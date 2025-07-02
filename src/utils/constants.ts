@@ -1,7 +1,7 @@
 import { ExpenseStatus, UserRole } from '../types';
 
-export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000/api';
-export const UPLOAD_URL = process.env.REACT_APP_UPLOAD_URL || 'http://localhost:3000';
+export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
+export const UPLOAD_URL = process.env.REACT_APP_UPLOAD_URL || 'http://localhost:5000';
 
 export const EXPENSE_STATUSES: Record<ExpenseStatus, { color: string; label: string }> = {
   PENDING: { color: '#ffa500', label: 'Pending Manager Approval' },
